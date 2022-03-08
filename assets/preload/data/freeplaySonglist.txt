@@ -1,5 +1,5 @@
-Tutorial:gf:1
-Ridge:dad:1
+Tutorial:gf:0
+Ridge:dad:0
 Bopeebo:dad:1
 Fresh:dad:1
 Dad Battle:dad:1

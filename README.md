@@ -5,7 +5,7 @@
 ```haxe
 inline static public function txt(key:String, ?library:String)
 {
-	return getPath('data/$key.txt', TEXT, library);
+	return getPath('$key.txt', TEXT, library);
 }
 ```
 and put this code below:
@@ -24,14 +24,7 @@ public static var highestCombo:Int = 0;
 
 private var executeModchart = false;
 ```
-or above this code:
-```haxe
-// API stuff
-
-public function addObject(object:FlxBasic) { add(object); }
-public function removeObject(object:FlxBasic) { remove(object); }
-```
-and put your code:
+and put your code shown below:
 ```haxe
 var hasLyrics:Bool = false;
 
@@ -56,11 +49,6 @@ var lyrText:String = '';
 var lyrAdded:Bool = false;
 
 var lyrObj:FlxText;
-
-// API stuff
-
-public function addObject(object:FlxBasic) { add(object); }
-public function removeObject(object:FlxBasic) { remove(object); }
 ```
 - 2. After you put your previous code, below this code:
 ```haxe
@@ -75,7 +63,7 @@ trace('Lyric File: ' + hasLyrics + " - " + Paths.lyric(PlayState.SONG.song.toLow
 lyricSteps = null;
 if (hasLyrics)
 {
-	lyricSteps = CoolUtil.coolTextFile(Paths.lyric(PlayState.SONG.song.toLowerCase() + "/lyrics"));
+	lyricSteps = CoolUtil.coolTextFile(Paths.lyric("data/" + PlayState.SONG.song.toLowerCase() + "/lyrics"));
 	var splitStep:Array<String> = lyricSteps[0].split(":");
 	curLyrStep = splitStep[1];
 	lyrText = lyricSteps[0].substr(splitStep[1].length + 2).trim();
@@ -135,8 +123,23 @@ doof.cameras = [camHUD];
 #if windows
 // Song duration in a float, useful for the time left feature
 songLength = FlxG.sound.music.length;
+
 // Updating Discord Rich Presence (with Time Left)
-DiscordClient.changePresence(detailsText + " " + SONG.song + " (" + storyDifficultyText + ") " + Ratings.GenerateLetterRank(accuracy), "Acc: " + HelperFunctions.truncateFloat(accuracy, 2) + "% | Score: " + songScore + " | Misses: " + misses  , iconRPC,true,  songLength - Conductor.songPosition);
+DiscordClient.changePresence(detailsText
+	+ " "
+	+ SONG.song
+	+ " ("
+	+ storyDifficultyText
+	+ ") "
+	+ Ratings.GenerateLetterRank(accuracy),
+	"Acc: "
+	+ HelperFunctions.truncateFloat(accuracy, 2)
+	+ "% | Score: "
+	+ songScore
+	+ " | Misses: "
+	+ misses, iconRPC, true,
+	songLength
+	- Conductor.songPosition);
 #end
 ```
 put this code:
