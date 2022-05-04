@@ -270,6 +270,16 @@ class PlayState extends MusicBeatState
 	// Less laggy controls
 	private var keysArray:Array<Dynamic>;
 
+	//FNF Lyricals
+	var hasLyrics:Bool = false;
+
+	var lyricSteps:Array<String>;
+	var curLyrStep:String = '';
+	var lyrText:String = '';
+	var lyrAdded:Bool = false;
+
+	var lyrObj:FlxText;
+
 	override public function create()
 	{
 		Paths.clearStoredMemory();
@@ -296,6 +306,21 @@ class PlayState extends MusicBeatState
 
 		if (FlxG.sound.music != null)
 			FlxG.sound.music.stop();
+
+		// Lyrical stuff
+		hasLyrics = FileSystem.exists(Paths.lyric((StringTools.replace(PlayState.SONG.song," ","-"))  + "/lyrics"));
+		trace('Lyric File: ' + hasLyrics + " - " + Paths.lyric(PlayState.SONG.song + "/lyrics"));
+
+		lyricSteps = null;
+		if (hasLyrics)
+		{
+			lyricSteps = CoolUtil.coolTextFile(Paths.lyric((StringTools.replace(PlayState.SONG.song," ","-")) + "/lyrics"));
+			var splitStep:Array<String> = lyricSteps[0].split(":");
+			curLyrStep = splitStep[1];
+			lyrText = lyricSteps[0].substr(splitStep[1].length + 2).trim();
+		}
+
+		lyrAdded = false;
 
 		// Gameplay settings
 		healthGain = ClientPrefs.getGameplaySetting('healthgain', 1);
@@ -1049,6 +1074,17 @@ class PlayState extends MusicBeatState
 			botplayTxt.y = timeBarBG.y - 78;
 		}
 
+		// You can change the font of lyricals to whatever you want, just put it to assets/fonts path.
+		lyrObj = new FlxText(0, 0, 0, "", 36);
+		lyrObj.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE,FlxColor.BLACK);
+		lyrObj.scrollFactor.set();
+		lyrObj.alignment = CENTER;
+		lyrObj.screenCenter();
+		lyrObj.x -= 450;
+		lyrObj.y += 200;
+		add(lyrObj);
+		lyrObj.text = '';
+
 		strumLineNotes.cameras = [camHUD];
 		grpNoteSplashes.cameras = [camHUD];
 		notes.cameras = [camHUD];
@@ -1061,6 +1097,7 @@ class PlayState extends MusicBeatState
 		timeBar.cameras = [camHUD];
 		timeBarBG.cameras = [camHUD];
 		timeTxt.cameras = [camHUD];
+		lyrObj.cameras = [camHUD];
 		doof.cameras = [camHUD];
 
 		// if (SONG.song == 'South')
@@ -4209,6 +4246,21 @@ class PlayState extends MusicBeatState
 		lastStepHit = curStep;
 		setOnLuas('curStep', curStep);
 		callOnLuas('onStepHit', []);
+
+		//ok i think that's it for lyricals
+		if ((("" +curStep) == curLyrStep) && hasLyrics)
+		{
+			if (lyrAdded = false)
+			{
+				lyrAdded = true;
+			}
+			lyrObj.text = lyrText;
+			trace(lyrText);
+			lyricSteps.remove(lyricSteps[0]);
+			var splitStep:Array<String> = lyricSteps[0].split(":");
+			curLyrStep = splitStep[1];
+			lyrText = lyricSteps[0].substr(splitStep[1].length + 2).trim();
+		}
 	}
 
 	var lightningStrikeBeat:Int = 0;

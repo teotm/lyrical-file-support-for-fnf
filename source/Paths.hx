@@ -166,6 +166,11 @@ class Paths
 		return getPath('data/$key.txt', TEXT, library);
 	}
 
+	inline static public function lyric(key:String, ?library:String) // Lyrical files
+	{
+		return getPath('data/$key.lyric', TEXT, library);
+	}
+
 	inline static public function xml(key:String, ?library:String)
 	{
 		return getPath('data/$key.xml', TEXT, library);
