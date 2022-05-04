@@ -1,170 +1,99 @@
-![GameJolt Thumbanil](art/madeInPaintNet/thumbnail.png)
-## How to setup the lyrical file support in source code?
-- You actually need to change two source files. `PlayState.hx` and `Paths.hx`.
-1. Open `Paths.hx` and look for this code:
-```haxe
-inline static public function txt(key:String, ?library:String)
-{
-	return getPath('$key.txt', TEXT, library);
-}
-```
-and put this code below:
-```haxe
-inline static public function lyric(key:String, ?library:String) // Lyrical files
-{
-	return getPath('data/$key.lyric', TEXT, library);
-}
-```
-after you did that you can go to the next step.
+# How to setup the lyrical file support in Psych?
+- I'll tell later, I don't wanna make a guide. By now, check the diff.
 
-2. Open `PlayState.hx`.
-- 1. Put your code below this code:
-```haxe
-public static var highestCombo:Int = 0;
+# Friday Night Funkin' - Psych Engine.
+Engine originally used on [Mind Games Mod](https://gamebanana.com/mods/301107), intended to be a fix for the vanilla version's many issues while keeping the casual play aspect of it. Also aiming to be an easier alternative to newbie coders.
 
-private var executeModchart = false;
-```
-and put your code shown below:
-```haxe
-var hasLyrics:Bool = false;
+## Installation:
+You must have [the most up-to-date version of Haxe](https://haxe.org/download/), seriously, stop using 4.1.5, it misses some stuff.
 
-var lyricSteps:Array<String>;
-var curLyrStep:String = '';
-var lyrText:String = '';
-var lyrAdded:Bool = false;
+Follow a Friday Night Funkin' source code compilation tutorial, after this you will need to install LuaJIT.
 
-var lyrObj:FlxText;
-```
-so it should look like that:
-```haxe
-public static var highestCombo:Int = 0;
+To install LuaJIT do this: `haxelib git linc_luajit https://github.com/AndreiRudenko/linc_luajit ` on a Command prompt/PowerShell
 
-private var executeModchart = false;
+...Or if you don't want your mod to be able to run .lua scripts, delete the "LUA_ALLOWED" line on Project.xml
 
-var hasLyrics:Bool = false;
+## Credits:
+* Shadow Mario - Coding
+* RiverOaken - Arts and Animations
+* bbpanzu - Assistant Coding
 
-var lyricSteps:Array<String>;
-var curLyrStep:String = '';
-var lyrText:String = '';
-var lyrAdded:Bool = false;
+### Special Thanks
+* shubs - New Input System
+* SqirraRNG - Chart Editor's Sound Waveform base code
+* iFlicky - Delay/Combo Menu Song Composer + Dialogue Sounds
+* PolybiusProxy - .MP4 Loader Extension
+* Keoiki - Note Splash Animations
+* Smokey - Spritemap Texture Atlas support
+* Cary - OG Resolution code
+* Nebula_Zorua - VCR Shader code
+_____________________________________
 
-var lyrObj:FlxText;
-```
-- 2. After you put your previous code, below this code:
-```haxe
-if (FlxG.sound.music != null)
-	FlxG.sound.music.stop();
-```
-put this:
-```haxe
-hasLyrics = FileSystem.exists(Paths.lyric(PlayState.SONG.song.toLowerCase()  + "/lyrics"));
-trace('Lyric File: ' + hasLyrics + " - " + Paths.lyric(PlayState.SONG.song.toLowerCase() + "/lyrics"));
+# Features
 
-lyricSteps = null;
-if (hasLyrics)
-{
-	lyricSteps = CoolUtil.coolTextFile(Paths.lyric("data/" + PlayState.SONG.song.toLowerCase() + "/lyrics"));
-	var splitStep:Array<String> = lyricSteps[0].split(":");
-	curLyrStep = splitStep[1];
-	lyrText = lyricSteps[0].substr(splitStep[1].length + 2).trim();
-}
-```
-- 3. Below this short code:
-```haxe
-repPresses = 0;
-repReleases = 0;
-```
-put:
-```haxe
-lyrAdded = false;
-```
-- 4. Below this code:
-```haxe
-iconP1 = new HealthIcon(SONG.player1, true);
-iconP1.y = healthBar.y - (iconP1.height / 2);
-add(iconP1);
+## Attractive animated dialogue boxes:
 
-iconP2 = new HealthIcon(SONG.player2, false);
-iconP2.y = healthBar.y - (iconP2.height / 2);
-add(iconP2);
-```
-put
-```haxe
-lyrObj = new FlxText(0, 0, 0, "", 36);
-lyrObj.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE,FlxColor.BLACK); // You can change the font to whatever you want, just put it to assets/fonts path.
-lyrObj.scrollFactor.set();
-lyrObj.alignment = CENTER;
-lyrObj.screenCenter();
-lyrObj.x -= 450;
-lyrObj.y += 200;
-add(lyrObj);
-lyrObj.text = '';
-```
-- 5. Between these lines which are close to previous code:
-```haxe
-scoreTxt.cameras = [camHUD];
-doof.cameras = [camHUD];
-```
-put
-```haxe
-lyrObj.cameras = [camHUD];
-```
-so this code will look like that:
-```haxe
-scoreTxt.cameras = [camHUD];
-lyrObj.cameras = [camHUD];
-doof.cameras = [camHUD];
-```
-- 6. In the `stepHit()` function above this code:
-```haxe
-// yes this updates every step.
-// yes this is bad
-// but i'm doing it to update misses and accuracy
-#if windows
-// Song duration in a float, useful for the time left feature
-songLength = FlxG.sound.music.length;
+![](https://user-images.githubusercontent.com/44785097/127706669-71cd5cdb-5c2a-4ecc-871b-98a276ae8070.gif)
 
-// Updating Discord Rich Presence (with Time Left)
-DiscordClient.changePresence(detailsText
-	+ " "
-	+ SONG.song
-	+ " ("
-	+ storyDifficultyText
-	+ ") "
-	+ Ratings.GenerateLetterRank(accuracy),
-	"Acc: "
-	+ HelperFunctions.truncateFloat(accuracy, 2)
-	+ "% | Score: "
-	+ songScore
-	+ " | Misses: "
-	+ misses, iconRPC, true,
-	songLength
-	- Conductor.songPosition);
-#end
-```
-put this code:
-```haxe
-if ((("" +curStep) == curLyrStep) && hasLyrics)
-{
-	if (lyrAdded = false)
-	{
-		lyrAdded = true;
-	}
-	lyrObj.text = lyrText;
-	trace(lyrText);
-	lyricSteps.remove(lyricSteps[0]);
-	var splitStep:Array<String> = lyricSteps[0].split(":");
-	curLyrStep = splitStep[1];
-	lyrText = lyricSteps[0].substr(splitStep[1].length + 2).trim();
-}
-```
-## How to use it if I did the setup?
-- Everything is explained on [GameJolt page](https://gamejolt.com/games/fnf_lyrics_moment/674546). I don't want to explain it here.
-## Can I setup lyrics with my custom font?
-- Yes, you can.
-- - 1. Put your custom font in `assets/fonts` (**IT HAS TO BE IN THE SOURCE CODE!**). The file extension has to be `.ttf` or `.otf` format.
-- - 2. Edit `PlayState.hx` and in this line:
-```haxe
-lyrObj.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE,FlxColor.BLACK);
-```
-you can change the `vcr.ttf` to whatever you want, but remember the font has to in `assets/fonts` path.
+
+## Mod Support
+* Probably one of the main points of this engine, you can code in .lua files outside of the source code, making your own weeks without even messing with the source!
+* Comes with a Mod Organizing/Disabling Menu. 
+
+
+## Atleast one change to every week:
+### Week 1:
+  * New Dad Left sing sprite 
+  * Unused stage lights are now used
+### Week 2:
+  * Both BF and Skid & Pump does "Hey!" animations
+  * Thunders does a quick light flash and zooms the camera in slightly
+  * Added a quick transition/cutscene to Monster
+### Week 3:
+  * BF does "Hey!" during Philly Nice
+  * Blammed has a cool new colors flash during that sick part of the song
+### Week 4:
+  * Better hair physics for Mom/Boyfriend (Maybe even slightly better than Week 7's :eyes:)
+  * Henchmen die during all songs. Yeah :(
+### Week 5:
+  * Bottom Boppers and GF does "Hey!" animations during Cocoa and Eggnog
+  * On Winter Horrorland, GF bops her head slower in some parts of the song.
+### Week 6:
+  * On Thorns, the HUD is hidden during the cutscene
+  * Also there's the Background girls being spooky during the "Hey!" parts of the Instrumental
+
+## Cool new Chart Editor changes and countless bug fixes
+![](https://github.com/ShadowMario/FNF-PsychEngine/blob/main/docs/img/chart.png?raw=true)
+* You can now chart "Event" notes, which are bookmarks that trigger specific actions that usually were hardcoded on the vanilla version of the game.
+* Your song's BPM can now have decimal values
+* You can manually adjust a Note's strum time if you're really going for milisecond precision
+* You can change a note's type on the Editor, it comes with two example types:
+  * Alt Animation: Forces an alt animation to play, useful for songs like Ugh/Stress
+  * Hey: Forces a "Hey" animation instead of the base Sing animation, if Boyfriend hits this note, Girlfriend will do a "Hey!" too.
+
+## Multiple editors to assist you in making your own Mod
+![Screenshot_3](https://user-images.githubusercontent.com/44785097/144629914-1fe55999-2f18-4cc1-bc70-afe616d74ae5.png)
+* Working both for Source code modding and Downloaded builds!
+
+## Story mode menu rework:
+![](https://i.imgur.com/UB2EKpV.png)
+* Added a different BG to every song (less Tutorial)
+* All menu characters are now in individual spritesheets, makes modding it easier.
+
+## Credits menu
+![Screenshot_1](https://user-images.githubusercontent.com/44785097/144632635-f263fb22-b879-4d6b-96d6-865e9562b907.png)
+* You can add a head icon, name, description and a Redirect link for when the player presses Enter while the item is currently selected.
+
+## Awards/Achievements
+* The engine comes with 16 example achievements that you can mess with and learn how it works (Check Achievements.hx and search for "checkForAchievement" on PlayState.hx)
+
+## Options menu:
+* You can change Note colors, Delay and Combo Offset, Controls and Preferences there.
+ * On Preferences you can toggle Downscroll, Middlescroll, Anti-Aliasing, Framerate, Low Quality, Note Splashes, Flashing Lights, etc.
+
+## Other gameplay features:
+* When the enemy hits a note, their strum note also glows.
+* Lag doesn't impact the camera movement and player icon scaling anymore.
+* Some stuff based on Week 7's changes has been put in (Background colors on Freeplay, Note splashes)
+* You can reset your Score on Freeplay/Story Mode by pressing Reset button.
+* You can listen to a song or adjust Scroll Speed/Damage taken/etc. on Freeplay by pressing Space.
