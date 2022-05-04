@@ -1,5 +1,5 @@
 # How to setup the lyrical file support in Psych 0.5.2h?
-- I'll tell later, I don't wanna make a guide. By now, check the [diff](https://github.com/teotm/lyrical-file-support-for-fnf/commit/77fe458d8f4274b8ebd69cbefe44b213c9a27742).
+- I'll tell later, I don't wanna make a guide right now. By now, check the [diff](https://github.com/teotm/lyrical-file-support-for-fnf/commit/77fe458d8f4274b8ebd69cbefe44b213c9a27742).
 - If you're using other version of Psych, that's ok cause it's basically the same way did in here.
 
 # I've gotta fix up the Kade 1.5.4 and 1.6.2 versions cause I know why lyricals would not work when there was a song with spaces and/or dashes.
